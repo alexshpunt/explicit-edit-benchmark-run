@@ -21,11 +21,12 @@ permissions:
 
 jobs:
   submit:
-    uses: alexshpunt/explicit-edit-benchmark/.github/workflows/official-submit.yml@640c173ae64e220b768273d6930675f6e0a22c8c
+    uses: alexshpunt/explicit-edit-benchmark/.github/workflows/official-submit.yml@6b39eca986e78f28758070ce7a0b343be58271b0
     with:
       producer_run_id: ${{ inputs.producer_run_id }}
       producer_attempt: ${{ inputs.producer_attempt }}
-      signer_sha: ba82ac048ca50491b1d074a0e42481d4605c9a8f
+      signer_sha: be568216c66a22149a1d869724ee3f2891b70988
+      policy_sha: 6b39eca986e78f28758070ce7a0b343be58271b0
       dataset_repository: alexshpunt/explicit-edit-benchmark
     secrets:
       hf_token: ${{ secrets.HF_TOKEN }}
