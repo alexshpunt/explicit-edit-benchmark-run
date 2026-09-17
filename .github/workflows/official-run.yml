@@ -1,0 +1,76 @@
+---
+# yamllint disable rule:line-length
+name: Run official benchmark
+
+"on":
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Exact registered model id
+        required: true
+        default: openai-codex/gpt-5.6-luna
+        type: string
+      thinking:
+        description: Reasoning level
+        required: true
+        default: low
+        type: choice
+        options: ["off", low, medium, high, max]
+      task:
+        description: Registered task id; one task is a valid partial run
+        required: true
+        default: replace-all-10-plain
+        type: string
+      adapter:
+        description: Adapter id from the benchmark registry
+        required: true
+        default: pi-default
+        type: string
+      agent_version:
+        description: Exact published agent package version
+        required: true
+        type: string
+      harness_version:
+        description: Exact extension version; required only for pi-agent-ide
+        required: false
+        default: ""
+        type: string
+      runtime_version:
+        description: Exact auxiliary runtime version when required
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+jobs:
+  run:
+    uses: alexshpunt/explicit-edit-benchmark/.github/workflows/official-run.yml@2d41294d4aa07ecfc5169baefbf5b7c27aeb7aab
+    with:
+      model: ${{ inputs.model }}
+      thinking: ${{ inputs.thinking }}
+      task: ${{ inputs.task }}
+      adapter: ${{ inputs.adapter }}
+      agent_version: ${{ inputs.agent_version }}
+      harness_version: ${{ inputs.harness_version }}
+      runtime_version: ${{ inputs.runtime_version }}
+      provider: openai-codex
+    secrets:
+      pi_auth_json: ${{ secrets.PI_AUTH_JSON }}
+
+  submit:
+    needs: run
+    uses: alexshpunt/explicit-edit-benchmark/.github/workflows/official-submit.yml@5ad01c9187113be0e1275b86dad89b1d12d042f4
+    with:
+      producer_run_id: ${{ github.run_id }}
+      producer_attempt: ${{ github.run_attempt }}
+      signer_sha: 2d41294d4aa07ecfc5169baefbf5b7c27aeb7aab
+      policy_sha: 5ad01c9187113be0e1275b86dad89b1d12d042f4
+      dataset_repository: alexshpunt/explicit-edit-benchmark
+    secrets:
+      hf_token: ${{ secrets.HF_TOKEN }}
